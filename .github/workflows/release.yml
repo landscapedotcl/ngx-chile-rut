@@ -25,8 +25,10 @@ jobs:
       - id: tag
         run: |
           branch="${{ github.event.release.target_commitish }}"
+          # Create releases with an explicit branch target: gh release create vX.Y.Z --target <branch>
           if [ "$branch" = "main" ]; then echo "tag=latest" >> "$GITHUB_OUTPUT";
-          else echo "tag=v${branch%%.x}-lts" >> "$GITHUB_OUTPUT"; fi
+          elif [[ "$branch" =~ ^[0-9]+\.x$ ]]; then echo "tag=v${branch%%.x}-lts" >> "$GITHUB_OUTPUT";
+          else echo "::error::Release target '$branch' must be main or an N.x branch"; exit 1; fi
       # Publish with a modern npm (provenance needs npm 9+), whatever Node built the package.
       - uses: actions/setup-node@v4
         with:

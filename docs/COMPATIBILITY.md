@@ -89,3 +89,17 @@ Node per Angular major is defined in `compat/node-for.sh`; the majors per line a
 npm run pack
 bash compat/run-consumer.sh 19 dist/ngx-chile-rut-*.tgz   # with Node 20 on PATH
 ```
+
+### Last verification (2026-10-09)
+
+All green in CI: [2.x on Angular 16 – 22](https://github.com/landscapedotcl/ngx-chile-rut/actions/runs/38016765867) · [1.x on Angular 9 – 15](https://github.com/landscapedotcl/ngx-chile-rut/actions/runs/38016764043).
+
+Harness quirks the next maintainer will hit (already handled in `run-consumer.sh`):
+
+- Angular ≤ 15 apps resolve `@types/node@latest` through webpack-dev-server typings, which
+  their TypeScript can't parse → `@types/node` is pinned to the app's Node major.
+- Angular ≤ 13 installs pull native modules (`fsevents@1`) that no longer compile → installed
+  with `--ignore-scripts` (`ng test` runs `ngcc` by itself).
+- Angular 21+ compiles tests AOT (Vitest): non-standalone test hosts must be declared in a real
+  `@NgModule`, not via `TestBed` `declarations`.
+- `standalone: false` doesn't type-check before Angular 14 → stripped from the spec for those majors.
