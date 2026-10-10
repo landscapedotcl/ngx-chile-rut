@@ -3,7 +3,9 @@
   "version": "2.0.0",
   "scripts": {
     "ng": "ng",
+    "start": "ng serve demo",
     "build": "ng build ngx-chile-rut",
+    "build:demo": "ng build demo",
     "test": "ng test ngx-chile-rut --watch=false --browsers=ChromeHeadlessCI",
     "test:watch": "ng test ngx-chile-rut",
     "pack": "npm run build && cd dist/ngx-chile-rut && npm pack --pack-destination ../",

@@ -122,6 +122,7 @@ second `valueChanges` emission.
 
 ```bash
 npm ci
+npm start         # demo app at http://localhost:4200 (uses the library from source)
 npm test          # unit tests (ChromeHeadless)
 npm run pack      # builds dist/ngx-chile-rut-x.y.z.tgz
 npm run compat    # consumer matrix across every supported Angular major (needs `n`)

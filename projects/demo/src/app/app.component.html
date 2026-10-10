@@ -1,0 +1,105 @@
+<header>
+  <h1>ngx-chile-rut <span class="tag">demo</span></h1>
+  <p>Banco de pruebas para la directiva <code>rutInput</code>, el validador, el pipe y los helpers.</p>
+</header>
+
+<main>
+  <!-- Reactive forms -->
+  <section class="card">
+    <h2>Formulario reactivo</h2>
+    <p class="hint"><code>&lt;input rutInput [formControl]="rut"&gt;</code> + <code>[Validators.required, rutValidator]</code></p>
+
+    <label for="reactive">RUT</label>
+    <input id="reactive" rutInput [formControl]="rutControl" placeholder="12.345.678-5" autocomplete="off"
+           [ngClass]="{ invalid: rutControl.invalid && rutControl.touched }">
+    <small class="error" *ngIf="rutControl.touched && rutControl.hasError('required')">El RUT es obligatorio</small>
+    <small class="error" *ngIf="rutControl.hasError('invalidRut')">RUT inválido</small>
+
+    <div class="actions">
+      <button type="button" (click)="setRandomValid()">setValue (válido aleatorio)</button>
+      <button type="button" (click)="setInvalid()">setValue (inválido)</button>
+      <button type="button" (click)="toggleDisabled()">{{ rutControl.disabled ? 'Habilitar' : 'Deshabilitar' }}</button>
+      <button type="button" class="secondary" (click)="reset()">reset()</button>
+    </div>
+
+    <dl class="state">
+      <dt>value (modelo)</dt><dd><code>{{ rutControl.value | json }}</code></dd>
+      <dt>value | rut</dt><dd><code>{{ rutControl.value | rut }}</code></dd>
+      <dt>valid</dt><dd [class.ok]="rutControl.valid" [class.ko]="!rutControl.valid">{{ rutControl.valid }}</dd>
+      <dt>errors</dt><dd><code>{{ rutControl.errors | json }}</code></dd>
+      <dt>touched / dirty</dt><dd>{{ rutControl.touched }} / {{ rutControl.dirty }}</dd>
+      <dt>valueChanges (últimos 5)</dt><dd><code>{{ valueChanges | json }}</code></dd>
+    </dl>
+  </section>
+
+  <!-- Template-driven forms -->
+  <section class="card">
+    <h2>Formulario template-driven</h2>
+    <p class="hint"><code>&lt;input rutInput rutValidate name="rut" [(ngModel)]="rut"&gt;</code></p>
+
+    <label for="template">RUT</label>
+    <input id="template" name="rut" rutInput rutValidate [(ngModel)]="templateRut" #model="ngModel"
+           placeholder="7.618.285-K" autocomplete="off" [ngClass]="{ invalid: model.invalid }">
+    <small class="error" *ngIf="model.hasError('invalidRut')">RUT inválido</small>
+
+    <div class="actions">
+      <button type="button" (click)="randomTemplateRut()">Asignar RUT aleatorio al modelo</button>
+    </div>
+
+    <dl class="state">
+      <dt>ngModel</dt><dd><code>{{ templateRut | json }}</code></dd>
+      <dt>valid</dt><dd [class.ok]="model.valid" [class.ko]="!model.valid">{{ model.valid }}</dd>
+      <dt>errors</dt><dd><code>{{ model.errors | json }}</code></dd>
+    </dl>
+  </section>
+
+  <!-- Plain input -->
+  <section class="card">
+    <h2>Input sin formularios</h2>
+    <p class="hint"><code>&lt;input rutInput&gt;</code>: formatea al salir del campo y limpia al entrar.</p>
+    <label for="plain">RUT</label>
+    <input id="plain" rutInput placeholder="Escribe y sal del campo" autocomplete="off">
+  </section>
+
+  <!-- Pipe -->
+  <section class="card">
+    <h2>Pipe <code>rut</code></h2>
+    <label for="pipe">Valor</label>
+    <input id="pipe" [(ngModel)]="pipeInput" autocomplete="off">
+    <p class="result"><code>{{ '{{' }} valor | rut {{ '}}' }}</code> → <strong>{{ pipeInput | rut }}</strong></p>
+  </section>
+
+  <!-- Helpers -->
+  <section class="card">
+    <h2>Helpers</h2>
+    <label for="helpers">Entrada</label>
+    <input id="helpers" [(ngModel)]="playground" autocomplete="off">
+    <table>
+      <tr><th>rutClean</th><td><code>{{ clean(playground) | json }}</code></td></tr>
+      <tr><th>rutFormat</th><td><code>{{ format(playground) | json }}</code></td></tr>
+      <tr><th>rutValidate</th><td [class.ok]="validate(playground)" [class.ko]="!validate(playground)">{{ validate(playground) }}</td></tr>
+      <tr><th>rutCheckDigit('{{ playgroundBody }}')</th><td><code>{{ checkDigit(playgroundBody) | json }}</code></td></tr>
+    </table>
+  </section>
+
+  <!-- Known cases -->
+  <section class="card wide">
+    <h2>Casos conocidos</h2>
+    <table class="cases">
+      <thead>
+        <tr><th>Entrada</th><th>rutFormat</th><th>Esperado</th><th>rutValidate</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of knownCases">
+          <td><code>{{ c.input | json }}</code></td>
+          <td><code>{{ format(c.input) }}</code></td>
+          <td>{{ c.expected }}</td>
+          <td>{{ validate(c.input) }}</td>
+          <td [class.ok]="validate(c.input) === c.expected" [class.ko]="validate(c.input) !== c.expected">
+            {{ validate(c.input) === c.expected ? '✔' : '✖' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</main>

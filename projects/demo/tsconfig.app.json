@@ -1,0 +1,19 @@
+/* The demo compiles the library from source, so changes show up without rebuilding dist/. */
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/app",
+    "types": [],
+    "paths": {
+      "ngx-chile-rut": [
+        "projects/ngx-chile-rut/src/public-api.ts"
+      ]
+    }
+  },
+  "files": [
+    "src/main.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
+}
