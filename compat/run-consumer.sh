@@ -26,6 +26,11 @@ INSTALL_ARGS=(--no-audit --no-fund --legacy-peer-deps)
 [ "$MAJOR" -le 13 ] && INSTALL_ARGS+=(--ignore-scripts)
 npm install "${INSTALL_ARGS[@]}" >/dev/null
 npm install "${INSTALL_ARGS[@]}" "$TARBALL" >/dev/null
+# Old CLIs depend on `@types/node: "*"`, which now resolves to typings their
+# TypeScript can't parse. Pin it to the Node version the app runs on.
+if [ "$MAJOR" -le 15 ]; then
+  npm install "${INSTALL_ARGS[@]}" -D "@types/node@$(bash "$HERE/node-for.sh" "$MAJOR")" >/dev/null
+fi
 
 # npm 6 (Node 12) only warns about peers, so check the range explicitly.
 node -e '
