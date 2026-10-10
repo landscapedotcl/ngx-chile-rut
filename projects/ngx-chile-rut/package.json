@@ -1,0 +1,33 @@
+{
+  "name": "ngx-chile-rut",
+  "version": "2.0.0",
+  "description": "Chilean RUT validation, formatting, pipe and input directive for Angular 16+",
+  "keywords": [
+    "angular",
+    "rut",
+    "chile",
+    "validation",
+    "formatter",
+    "directive",
+    "pipe",
+    "validator"
+  ],
+  "author": "Landscape SpA",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/landscapedotcl/ngx-chile-rut.git"
+  },
+  "homepage": "https://github.com/landscapedotcl/ngx-chile-rut#readme",
+  "bugs": {
+    "url": "https://github.com/landscapedotcl/ngx-chile-rut/issues"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=16.0.0 <23.0.0",
+    "@angular/forms": ">=16.0.0 <23.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}

@@ -1,11 +1,15 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { rutFormat } from './rut-helpers';
 
+/**
+ * Formats a RUT in templates: `{{ '7618285K' | rut }}` → `7.618.285-K`.
+ */
 @Pipe({
   name: 'rut',
+  standalone: true,
 })
 export class RutPipe implements PipeTransform {
-  public transform(value: string): string {
+  transform(value: unknown): string {
     return rutFormat(value);
   }
 }

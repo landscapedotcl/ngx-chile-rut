@@ -3,44 +3,39 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ng9-rut": {
+    "ngx-chile-rut": {
       "projectType": "library",
-      "root": "projects/ng9-rut",
-      "sourceRoot": "projects/ng9-rut/src",
+      "root": "projects/ngx-chile-rut",
+      "sourceRoot": "projects/ngx-chile-rut/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "tsConfig": "projects/ng9-rut/tsconfig.lib.json",
-            "project": "projects/ng9-rut/ng-package.json"
+            "project": "projects/ngx-chile-rut/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/ng9-rut/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-chile-rut/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-chile-rut/tsconfig.lib.json"
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/ng9-rut/src/test.ts",
-            "tsConfig": "projects/ng9-rut/tsconfig.spec.json",
-            "karmaConfig": "projects/ng9-rut/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": [
-              "projects/ng9-rut/**/*.ts",
-              "projects/ng9-rut/**/*.html"
-            ]
+            "tsConfig": "projects/ngx-chile-rut/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "karmaConfig": "projects/ngx-chile-rut/karma.conf.js"
           }
         }
       }
-    }},
-  "cli": {
-    "analytics": "109706c9-b2fb-47b5-b181-604f614934b3"
+    }
   }
 }
