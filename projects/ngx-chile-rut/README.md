@@ -69,6 +69,8 @@ export class AppModule {}
 - Shows `7.618.285-K` while the input is blurred and `7618285K` while it's focused.
 - The form model **always receives the clean value** (`7618285K`), whatever the user typed.
 - Values set programmatically (`setValue`, `ngModel`) are displayed formatted.
+- Add `rutDashOnly` to display it without dots: `<input rutInput rutDashOnly>` → `15751905-0`
+  (also bindable: `[rutDashOnly]="flag"`). The model is still the clean value.
 
 ### Validation
 
@@ -89,7 +91,8 @@ Template-driven forms — use the `rutValidate` directive:
 ### `rut` pipe
 
 ```html
-{{ '7618285K' | rut }}   <!-- 7.618.285-K -->
+{{ '7618285K' | rut }}                    <!-- 7.618.285-K -->
+{{ '157519050' | rut:{ dots: false } }}  <!-- 15751905-0 -->
 ```
 
 ### Helpers
@@ -99,6 +102,7 @@ import { rutClean, rutFormat, rutValidate, rutCheckDigit } from 'ngx-chile-rut';
 
 rutClean('7.618.285-k');   // '7618285K'
 rutFormat('7618285K');     // '7.618.285-K'
+rutFormat('157519050', { dots: false }); // '15751905-0'
 rutValidate('7.618.285-K'); // true
 rutCheckDigit('7618285');  // 'K'
 ```
@@ -122,6 +126,7 @@ second `valueChanges` emission.
 
 ```bash
 npm ci
+npm start         # demo app at http://localhost:4200 (uses the library from source)
 npm test          # unit tests (ChromeHeadless)
 npm run pack      # builds dist/ngx-chile-rut-x.y.z.tgz
 npm run compat    # consumer matrix across every supported Angular major (needs `n`)

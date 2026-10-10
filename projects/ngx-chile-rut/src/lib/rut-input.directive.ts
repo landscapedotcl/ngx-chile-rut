@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener, Renderer2, forwardRef } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, Renderer2, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { rutClean, rutFormat } from './rut-helpers';
 
@@ -7,6 +7,8 @@ import { rutClean, rutFormat } from './rut-helpers';
  *
  * When used with `ngModel`, `formControl` or `formControlName` the model always
  * receives the clean value (`7618285K`), whatever the user typed.
+ *
+ * Add `rutDashOnly` to display `15751905-0` instead of `15.751.905-0`.
  */
 @Directive({
   selector: 'input[rutInput]',
@@ -19,8 +21,18 @@ export class RutInputDirective implements ControlValueAccessor {
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
   private focused = false;
+  private dashOnly = false;
 
   constructor(private renderer: Renderer2, private elementRef: ElementRef) {}
+
+  /** Display the RUT without thousands separators: `<input rutInput rutDashOnly>`. */
+  @Input()
+  set rutDashOnly(value: boolean | string | null | undefined) {
+    this.dashOnly = value != null && `${value}` !== 'false';
+    if (!this.focused) {
+      this.setViewValue(this.format(this.viewValue));
+    }
+  }
 
   @HostListener('input')
   handleInput(): void {
@@ -36,13 +48,13 @@ export class RutInputDirective implements ControlValueAccessor {
   @HostListener('blur')
   handleBlur(): void {
     this.focused = false;
-    this.setViewValue(rutFormat(this.viewValue));
+    this.setViewValue(this.format(this.viewValue));
     this.onTouched();
   }
 
   writeValue(value: unknown): void {
     const clean = rutClean(value);
-    this.setViewValue(this.focused ? clean : rutFormat(clean));
+    this.setViewValue(this.focused ? clean : this.format(clean));
   }
 
   registerOnChange(fn: (value: string) => void): void {
@@ -55,6 +67,10 @@ export class RutInputDirective implements ControlValueAccessor {
 
   setDisabledState(isDisabled: boolean): void {
     this.renderer.setProperty(this.elementRef.nativeElement, 'disabled', isDisabled);
+  }
+
+  private format(value: unknown): string {
+    return rutFormat(value, { dots: !this.dashOnly });
   }
 
   private get viewValue(): string {

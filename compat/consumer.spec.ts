@@ -27,12 +27,15 @@ function typeInto(input: HTMLInputElement, value: string): void {
     <span class="pipe">{{ raw | rut }}</span>
     <input class="reactive" rutInput [formControl]="control">
     <input class="template" name="rut" rutInput rutValidate [(ngModel)]="model">
+    <input class="dash-only" rutInput rutDashOnly [formControl]="dashOnlyControl">
+    <span class="pipe-dash-only">{{ raw | rut:{ dots: false } }}</span>
   `,
 })
 class ConsumerHostComponent {
   raw = '7618285K';
   control = new FormControl('', [Validators.required, rutValidator]);
   model = '';
+  dashOnlyControl = new FormControl('');
 }
 
 // A real NgModule (instead of TestBed declarations) so AOT-compiled test runners
@@ -110,5 +113,15 @@ describe('ngx-chile-rut consumer', () => {
     await fixture.whenStable();
     expect(host.model).toBe('7618285K');
     expect(input.classList.contains('ng-valid')).toBe(true);
+  });
+
+  it('formats without dots with rutDashOnly and the pipe option', () => {
+    const input = el.querySelector('.dash-only') as HTMLInputElement;
+    typeInto(input, '15.751.905-0');
+    dispatch(input, 'blur');
+    expect(input.value).toBe('15751905-0');
+    expect(host.dashOnlyControl.value).toBe('157519050');
+    expect(rutFormat('157519050', { dots: false })).toBe('15751905-0');
+    expect((el.querySelector('.pipe-dash-only') as HTMLElement).textContent).toBe('7618285-K');
   });
 });

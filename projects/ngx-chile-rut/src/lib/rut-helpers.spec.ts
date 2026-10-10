@@ -92,5 +92,26 @@ describe('rut-helpers', () => {
     it('returns an empty string for non string values', () => {
       expect(rutFormat(null)).toBe('');
     });
+
+    describe('with { dots: false }', () => {
+      const dashOnly: Array<[string, string]> = [
+        ['157519050', '15751905-0'],
+        ['15.751.905-0', '15751905-0'],
+        ['7618285k', '7618285-K'],
+        ['19', '1-9'],
+        ['1', '1'],
+        ['', ''],
+      ];
+      dashOnly.forEach(([input, output]) => {
+        it(`${JSON.stringify(input)} → ${JSON.stringify(output)}`, () => {
+          expect(rutFormat(input, { dots: false })).toBe(output);
+        });
+      });
+
+      it('keeps dots with { dots: true } or empty options', () => {
+        expect(rutFormat('157519050', { dots: true })).toBe('15.751.905-0');
+        expect(rutFormat('157519050', {})).toBe('15.751.905-0');
+      });
+    });
   });
 });
