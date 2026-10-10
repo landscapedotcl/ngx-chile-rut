@@ -60,17 +60,25 @@ export function rutValidate(value: unknown): boolean {
   return rutCheckDigit(body) === rut.slice(-1);
 }
 
+export interface RutFormatOptions {
+  /** Thousands separators in the body. `false` gives `15751905-0`. Defaults to `true`. */
+  dots?: boolean;
+}
+
 /**
- * Formats a RUT as `XX.XXX.XXX-X`. Works on partial input too.
+ * Formats a RUT as `XX.XXX.XXX-X`, or `XXXXXXXX-X` with `{ dots: false }`.
+ * Works on partial input too.
  *
  * rutFormat('7618285K') === '7.618.285-K'
+ * rutFormat('157519050', { dots: false }) === '15751905-0'
  */
-export function rutFormat(value: unknown): string {
+export function rutFormat(value: unknown, options?: RutFormatOptions): string {
   const rut = rutClean(value);
   if (rut.length <= 1) {
     return rut;
   }
   const body = rut.slice(0, -1);
   const dv = rut.slice(-1);
-  return `${body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}-${dv}`;
+  const dots = !options || options.dots !== false;
+  return `${dots ? body.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : body}-${dv}`;
 }

@@ -55,7 +55,7 @@ label {
   margin-bottom: 0.35rem;
 }
 
-input {
+input:not([type='checkbox']) {
   width: 100%;
   box-sizing: border-box;
   font: inherit;
@@ -162,4 +162,12 @@ th {
 .ko {
   color: var(--ko);
   font-weight: 600;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-weight: 400;
 }

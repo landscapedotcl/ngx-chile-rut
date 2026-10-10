@@ -35,11 +35,19 @@ class TemplateHostComponent {
   rut: string | null = '';
 }
 
+@Component({
+  template: `<input rutInput [rutDashOnly]="dashOnly" [formControl]="control">`,
+})
+class DashOnlyHostComponent {
+  dashOnly: boolean | string = '';
+  control = new FormControl('');
+}
+
 describe('RutInputDirective', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, ReactiveFormsModule, NgxChileRutModule],
-      declarations: [PlainHostComponent, ReactiveHostComponent, TemplateHostComponent],
+      declarations: [PlainHostComponent, ReactiveHostComponent, TemplateHostComponent, DashOnlyHostComponent],
     });
   });
 
@@ -159,6 +167,44 @@ describe('RutInputDirective', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       expect(inputOf(fixture).value).toBe('11.111.111-1');
+    });
+  });
+
+  describe('with rutDashOnly', () => {
+    let fixture: ComponentFixture<DashOnlyHostComponent>;
+    let host: DashOnlyHostComponent;
+    let input: HTMLInputElement;
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(DashOnlyHostComponent);
+      host = fixture.componentInstance;
+      fixture.detectChanges();
+      input = inputOf(fixture);
+    });
+
+    it('formats with dash only on blur and keeps the clean model', () => {
+      type(input, '15.751.905-0');
+      dispatch(input, 'blur');
+      expect(input.value).toBe('15751905-0');
+      expect(host.control.value).toBe('157519050');
+    });
+
+    it('formats programmatic values with dash only', () => {
+      host.control.setValue('157519050');
+      expect(input.value).toBe('15751905-0');
+    });
+
+    it('treats the bare attribute as true and "false" as false', () => {
+      host.control.setValue('157519050');
+      host.dashOnly = 'false';
+      fixture.detectChanges();
+      expect(input.value).toBe('15.751.905-0');
+      host.dashOnly = true;
+      fixture.detectChanges();
+      expect(input.value).toBe('15751905-0');
+      host.dashOnly = false;
+      fixture.detectChanges();
+      expect(input.value).toBe('15.751.905-0');
     });
   });
 });

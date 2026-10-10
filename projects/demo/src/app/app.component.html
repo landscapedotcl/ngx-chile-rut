@@ -10,10 +10,12 @@
     <p class="hint"><code>&lt;input rutInput [formControl]="rut"&gt;</code> + <code>[Validators.required, rutValidator]</code></p>
 
     <label for="reactive">RUT</label>
-    <input id="reactive" rutInput [formControl]="rutControl" placeholder="12.345.678-5" autocomplete="off"
+    <input id="reactive" rutInput [rutDashOnly]="dashOnly" [formControl]="rutControl" placeholder="12.345.678-5" autocomplete="off"
            [ngClass]="{ invalid: rutControl.invalid && rutControl.touched }">
     <small class="error" *ngIf="rutControl.touched && rutControl.hasError('required')">El RUT es obligatorio</small>
     <small class="error" *ngIf="rutControl.hasError('invalidRut')">RUT inválido</small>
+
+    <label class="check"><input type="checkbox" [(ngModel)]="dashOnly"> <code>rutDashOnly</code> (sin puntos: 15751905-0)</label>
 
     <div class="actions">
       <button type="button" (click)="setRandomValid()">setValue (válido aleatorio)</button>
@@ -67,6 +69,7 @@
     <label for="pipe">Valor</label>
     <input id="pipe" [(ngModel)]="pipeInput" autocomplete="off">
     <p class="result"><code>{{ '{{' }} valor | rut {{ '}}' }}</code> → <strong>{{ pipeInput | rut }}</strong></p>
+    <p class="result"><code>{{ '{{' }} valor | rut:{{ '{' }} dots: false {{ '}' }} {{ '}}' }}</code> → <strong>{{ pipeInput | rut:{ dots: false } }}</strong></p>
   </section>
 
   <!-- Helpers -->
@@ -77,6 +80,7 @@
     <table>
       <tr><th>rutClean</th><td><code>{{ clean(playground) | json }}</code></td></tr>
       <tr><th>rutFormat</th><td><code>{{ format(playground) | json }}</code></td></tr>
+      <tr><th>rutFormat(…, {{ '{' }} dots: false {{ '}' }})</th><td><code>{{ formatDashOnly(playground) | json }}</code></td></tr>
       <tr><th>rutValidate</th><td [class.ok]="validate(playground)" [class.ko]="!validate(playground)">{{ validate(playground) }}</td></tr>
       <tr><th>rutCheckDigit('{{ playgroundBody }}')</th><td><code>{{ checkDigit(playgroundBody) | json }}</code></td></tr>
     </table>

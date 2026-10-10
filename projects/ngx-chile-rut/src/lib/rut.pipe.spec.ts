@@ -4,7 +4,7 @@ import { NgxChileRutModule } from './ngx-chile-rut.module';
 import { RutPipe } from './rut.pipe';
 
 @Component({
-  template: `<span>{{ value | rut }}</span>`,
+  template: `<span>{{ value | rut }}</span><b>{{ value | rut:{ dots: false } }}</b>`,
 })
 class PipeHostComponent {
   value: unknown = '7618285K';
@@ -21,6 +21,10 @@ describe('RutPipe', () => {
     expect(pipe.transform('7.618.285-k')).toBe('7.618.285-K');
   });
 
+  it('formats without dots when { dots: false } is given', () => {
+    expect(pipe.transform('157519050', { dots: false })).toBe('15751905-0');
+  });
+
   it('returns an empty string for empty values', () => {
     expect(pipe.transform(null)).toBe('');
     expect(pipe.transform(undefined)).toBe('');
@@ -33,10 +37,13 @@ describe('RutPipe', () => {
     });
     const fixture = TestBed.createComponent(PipeHostComponent);
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent.trim()).toBe('7.618.285-K');
+    const el: HTMLElement = fixture.nativeElement;
+    expect((el.querySelector('span') as HTMLElement).textContent).toBe('7.618.285-K');
+    expect((el.querySelector('b') as HTMLElement).textContent).toBe('7618285-K');
 
     fixture.componentInstance.value = 111111111;
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent.trim()).toBe('11.111.111-1');
+    expect((el.querySelector('span') as HTMLElement).textContent).toBe('11.111.111-1');
+    expect((el.querySelector('b') as HTMLElement).textContent).toBe('11111111-1');
   });
 });

@@ -12,6 +12,8 @@ First release as **`ngx-chile-rut`** (previously `ng9-rut`).
 ### Added
 - Standalone `RutPipe`, `RutInputDirective` and `RutValidatorDirective` (also bundled in `NgxChileRutModule`).
 - `rutCheckDigit()` helper.
+- Dash-only format (`15751905-0`): `rutDashOnly` input on `rutInput`, `rutFormat(value, { dots: false })`
+  and `rut:{ dots: false }` pipe option.
 - Consumer compatibility matrix (`compat/`) testing a fresh app of every Angular major 16 – 22 in CI.
 
 ### Changed

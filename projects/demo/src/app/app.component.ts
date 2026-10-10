@@ -39,6 +39,7 @@ export class AppComponent {
   readonly valueChanges: unknown[] = [];
 
   templateRut = '';
+  dashOnly = false;
   pipeInput = '7618285K';
   playground = '7.618.285-k';
 
@@ -73,6 +74,10 @@ export class AppComponent {
 
   format(value: string): string {
     return rutFormat(value);
+  }
+
+  formatDashOnly(value: string): string {
+    return rutFormat(value, { dots: false });
   }
 
   validate(value: string): boolean {
