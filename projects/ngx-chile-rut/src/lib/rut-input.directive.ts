@@ -10,7 +10,6 @@ import { rutClean, rutFormat } from './rut-helpers';
  */
 @Directive({
   selector: 'input[rutInput]',
-  standalone: true,
   exportAs: 'rutInput',
   providers: [
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RutInputDirective), multi: true },

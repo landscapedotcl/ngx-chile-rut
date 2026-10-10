@@ -1,14 +1,10 @@
 // Consumer test: runs inside a fresh `ng new` app of every supported Angular major,
 // against the packed library tarball. Keep it compatible with TypeScript 3.8 (Angular 9)
 // and with both Jasmine/Karma and Vitest runners.
-import { Component } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgxChileRutModule, rutClean, rutFormat, rutValidate, rutValidator } from 'ngx-chile-rut';
-
-// Angular 19+ makes components standalone by default; older versions ignore the flag.
-// Going through a const keeps TypeScript < 4.x from rejecting the unknown property.
-const ngModuleComponent: any = { standalone: false };
 
 function dispatch(input: HTMLInputElement, type: string): void {
   const event = document.createEvent('Event');
@@ -22,8 +18,10 @@ function typeInto(input: HTMLInputElement, value: string): void {
   dispatch(input, 'input');
 }
 
+// Angular 19+ makes components standalone by default, so opt out explicitly.
+// run-consumer.sh strips this line for Angular < 14, where the property doesn't exist.
 @Component({
-  ...ngModuleComponent,
+  standalone: false,
   selector: 'rut-consumer-host',
   template: `
     <span class="pipe">{{ raw | rut }}</span>
@@ -37,16 +35,21 @@ class ConsumerHostComponent {
   model = '';
 }
 
+// A real NgModule (instead of TestBed declarations) so AOT-compiled test runners
+// (Angular 21+ unit-test builder) resolve the template scope too.
+@NgModule({
+  imports: [FormsModule, ReactiveFormsModule, NgxChileRutModule],
+  declarations: [ConsumerHostComponent],
+})
+class ConsumerTestModule {}
+
 describe('ngx-chile-rut consumer', () => {
   let fixture: ComponentFixture<ConsumerHostComponent>;
   let host: ConsumerHostComponent;
   let el: HTMLElement;
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({
-      imports: [FormsModule, ReactiveFormsModule, NgxChileRutModule],
-      declarations: [ConsumerHostComponent],
-    });
+    TestBed.configureTestingModule({ imports: [ConsumerTestModule] });
     fixture = TestBed.createComponent(ConsumerHostComponent);
     host = fixture.componentInstance;
     el = fixture.nativeElement;

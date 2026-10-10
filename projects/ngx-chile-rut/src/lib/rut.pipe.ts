@@ -6,7 +6,6 @@ import { rutFormat } from './rut-helpers';
  */
 @Pipe({
   name: 'rut',
-  standalone: true,
 })
 export class RutPipe implements PipeTransform {
   transform(value: unknown): string {

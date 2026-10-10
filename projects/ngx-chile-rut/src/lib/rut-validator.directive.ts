@@ -21,7 +21,6 @@ export function rutValidator(control: AbstractControl): ValidationErrors | null 
  */
 @Directive({
   selector: '[rutValidate]',
-  standalone: true,
   providers: [
     { provide: NG_VALIDATORS, useExisting: forwardRef(() => RutValidatorDirective), multi: true },
   ],

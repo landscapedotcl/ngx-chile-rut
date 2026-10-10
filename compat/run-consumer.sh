@@ -20,8 +20,12 @@ npx -p "@angular/cli@${MAJOR}" ng new "ng${MAJOR}" \
   --defaults --skip-git --skip-install --style=css --routing=false >/dev/null
 cd "$WORK"
 
-npm install --no-audit --no-fund --legacy-peer-deps >/dev/null
-npm install --no-audit --no-fund --legacy-peer-deps "$TARBALL" >/dev/null
+# Old toolchains pull native modules (e.g. fsevents@1) that no longer compile; their
+# install scripts aren't needed to run tests (`ng test` runs ngcc by itself).
+INSTALL_ARGS=(--no-audit --no-fund --legacy-peer-deps)
+[ "$MAJOR" -le 13 ] && INSTALL_ARGS+=(--ignore-scripts)
+npm install "${INSTALL_ARGS[@]}" >/dev/null
+npm install "${INSTALL_ARGS[@]}" "$TARBALL" >/dev/null
 
 # npm 6 (Node 12) only warns about peers, so check the range explicitly.
 node -e '
@@ -38,6 +42,12 @@ node -e '
 
 find src -name '*.spec.ts' -delete
 cp "$HERE/consumer.spec.ts" src/app/
+if [ "$MAJOR" -lt 14 ]; then
+  node -e '
+    const fs = require("fs"); const f = process.argv[1];
+    fs.writeFileSync(f, fs.readFileSync(f, "utf8").replace(/^ *standalone: false,\n/m, ""));
+  ' src/app/consumer.spec.ts
+fi
 # Standalone APIs are only shipped by the Angular 14+ lines (the spec is absent elsewhere).
 if [ -f "$HERE/consumer-standalone.spec.ts" ]; then
   cp "$HERE/consumer-standalone.spec.ts" src/app/

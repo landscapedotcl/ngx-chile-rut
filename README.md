@@ -1,204 +1,136 @@
-Angular 17 RUT
-==============
+# ngx-chile-rut
 
-Modern Angular 17+ library with several components to handle [Chilean RUT](https://en.wikipedia.org/wiki/National_identification_number#Chile) validation, cleaning and formatting.
+[![CI](https://github.com/landscapedotcl/ngx-chile-rut/actions/workflows/ci.yml/badge.svg)](https://github.com/landscapedotcl/ngx-chile-rut/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/ngx-chile-rut.svg)](https://www.npmjs.com/package/ngx-chile-rut)
 
-Originally forked from [ng2-rut](https://github.com/platanus/ng2-rut) and fully updated to work with Angular 17+ and modern development practices.
+Validation, formatting, pipe and input directive for the
+[Chilean RUT](https://en.wikipedia.org/wiki/National_identification_number#Chile), for **Angular 9 to 22**.
+
+Successor of [`ng9-rut`](https://www.npmjs.com/package/ng9-rut) (itself based on
+[ng2-rut](https://github.com/platanus/ng2-rut)).
 
 ## Installation
 
-```bash
-npm install ng9-rut --save
-# or
-yarn add ng9-rut
-```
+Pick the line that matches your Angular version:
 
-## Requirements
+| Your Angular | Install | Line |
+|--------------|---------|------|
+| 16 – 22 | `npm i ngx-chile-rut` | 2.x |
+| 9 – 15 | `npm i ngx-chile-rut@v1-lts` | 1.x |
 
-### Node.js Version Compatibility
-
-This library is designed to work with **Node.js 18.x or higher**.
-
-**Supported versions:**
-- **Minimum:** Node.js 18.13.0
-- **Recommended:** Node.js 20.x+ (for optimal performance with Angular 17)
-- **Angular 17+** (which this library targets) officially supports Node.js 18.13.0 and higher
-
-### Version Compatibility
-
-| Library Version | Angular | Node.js | TypeScript |
-|----------------|---------|---------|------------|
-| 0.2.0+ | 17.0.0+ | 18.13.0+ | 5.4+ |
-| 0.1.1 | 9.1.0 - 16.x | 12.11.1 - 16.x | 4.7+ |
+Both lines have the same API. See [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) for
+why the split is at Angular 16 and how every Angular major is tested.
 
 ## Usage
 
-### Set-up:
+### Standalone (2.x)
 
-The easiest way to use this library is to import `Ng9RutModule` in your app's main module.
-
-```typescript
-import { NgModule } from '@angular/core';
-import { Ng9RutModule } from 'ng9-rut';
-import { BrowserModule } from '@angular/platform-browser';
-
-@NgModule({
-  imports: [
-    BrowserModule,
-    Ng9RutModule
-  ],
-})
-class AppModule { }
-```
-
-### Features:
-
-ng9-rut exposes multiple features that can be used to perform input validation and formatting:
-
-- **`RutValidator`**: Exposes the `ngValidateRut` directive (for template-driven forms) and the `RutValidator` class for reactive forms.
-- **`RutPipe`**: Exposes the `rut` pipe to format RUT numbers in templates.
-- **`RutDirective`**: Exposes the `ngRut` directive to format RUT inputs automatically.
-
-#### RutValidator
-
-##### Reactive Forms
-
-```typescript
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { RutValidator } from 'ng9-rut';
-import { inject } from '@angular/core';
-
-export class AppComponent {
-  private fb = inject(FormBuilder);
-  private rutValidator = inject(RutValidator);
-
-  reactiveForm = this.fb.group({
-    rut: ['30972198', [Validators.required, this.rutValidator.validate]]
-  });
-}
-```
-
-##### Template-Driven Forms
-```html
-<input [(ngModel)]="user.rut" name="rut" ngValidateRut required>
-```
-
-#### RutPipe
-
-```html
-{{ user.rut }}
-<!-- 30972198 -->
-{{ user.rut | rut }}
-<!-- 3.097.219-8 -->
-```
-
-#### RutDirective (Auto-formatting)
-```html
-<input [(ngModel)]="user.rut" name="rut" ngRut required>
-<!--
-(on blur) → formats to: 3.097.219-8
-(on focus) → clears to: 30972198
--->
-```
-
-### Complete Example
-
-```typescript
+```ts
 import { Component } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
-import { RutValidator } from 'ng9-rut';
-import { inject } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RutInputDirective, RutPipe, rutValidator } from 'ngx-chile-rut';
 
 @Component({
-  selector: 'app-rut-example',
+  selector: 'app-signup',
+  standalone: true,
+  imports: [NgIf, ReactiveFormsModule, RutInputDirective, RutPipe],
   template: `
-    <div>
-      <h3>Reactive Form</h3>
-      <form [formGroup]="reactiveForm">
-        <input formControlName="rut" placeholder="Enter RUT">
-        <div *ngIf="reactiveForm.get('rut')?.invalid && reactiveForm.get('rut')?.touched">
-          Invalid RUT
-        </div>
-      </form>
-      
-      <h3>Template Form with Auto-formatting</h3>
-      <input [(ngModel)]="templateRut" ngRut ngValidateRut placeholder="Enter RUT">
-      
-      <h3>Display with Pipe</h3>
-      <p>Formatted: {{ templateRut | rut }}</p>
-    </div>
-  `
+    <input rutInput [formControl]="rut">
+    <small *ngIf="rut.hasError('invalidRut')">RUT inválido</small>
+    <p>{{ rut.value | rut }}</p>
+  `,
 })
-export class RutExampleComponent {
-  private fb = inject(FormBuilder);
-  private rutValidator = inject(RutValidator);
-  
-  templateRut = '';
-  
-  reactiveForm = this.fb.group({
-    rut: ['', [Validators.required, this.rutValidator.validate]]
-  });
+export class SignupComponent {
+  rut = new FormControl('', [Validators.required, rutValidator]);
 }
 ```
 
-## Migration from v0.1.x
+### NgModule (1.x and 2.x)
 
-If you're upgrading from version 0.1.x, you need to update your directive selectors:
+```ts
+import { NgModule } from '@angular/core';
+import { NgxChileRutModule } from 'ngx-chile-rut';
 
-```html
-<!-- Before (v0.1.x) -->
-<input formatRut [(ngModel)]="rut">
-<input validateRut [(ngModel)]="rut">
-
-<!-- After (v0.2.0+) -->
-<input ngRut [(ngModel)]="rut">
-<input ngValidateRut [(ngModel)]="rut">
+@NgModule({
+  imports: [NgxChileRutModule],
+})
+export class AppModule {}
 ```
 
-The pipe and programmatic API remain unchanged.
+### `rutInput` directive
+
+```html
+<input rutInput [formControl]="rut">
+<input rutInput name="rut" [(ngModel)]="user.rut">
+<input rutInput>  <!-- also works without forms -->
+```
+
+- Shows `7.618.285-K` while the input is blurred and `7618285K` while it's focused.
+- The form model **always receives the clean value** (`7618285K`), whatever the user typed.
+- Values set programmatically (`setValue`, `ngModel`) are displayed formatted.
+
+### Validation
+
+Reactive forms — use the `rutValidator` function:
+
+```ts
+new FormControl('', [Validators.required, rutValidator]);
+// invalid → { invalidRut: true }; empty values are valid (combine with Validators.required)
+```
+
+Template-driven forms — use the `rutValidate` directive:
+
+```html
+<input rutInput rutValidate name="rut" [(ngModel)]="user.rut" #rut="ngModel">
+<small *ngIf="rut.hasError('invalidRut')">RUT inválido</small>
+```
+
+### `rut` pipe
+
+```html
+{{ '7618285K' | rut }}   <!-- 7.618.285-K -->
+```
+
+### Helpers
+
+```ts
+import { rutClean, rutFormat, rutValidate, rutCheckDigit } from 'ngx-chile-rut';
+
+rutClean('7.618.285-k');   // '7618285K'
+rutFormat('7618285K');     // '7.618.285-K'
+rutValidate('7.618.285-K'); // true
+rutCheckDigit('7618285');  // 'K'
+```
+
+## Migrating from `ng9-rut`
+
+| ng9-rut 0.1.x | ngx-chile-rut |
+|---------------|---------------|
+| `Ng9RutModule` | `NgxChileRutModule` |
+| `formatRut` directive | `rutInput` |
+| `validateRut` directive | `rutValidate` |
+| `RutValidator` (injected) | `rutValidator` function |
+| `rut` pipe | `rut` pipe (unchanged) |
+| error `{ invalidRut: true }` | unchanged |
+
+Behavior changes: the model always holds the clean RUT (before it depended on whether
+the value was typed or set programmatically), and `setValue` no longer triggers a
+second `valueChanges` emission.
 
 ## Development
 
-### Building the Library
-
 ```bash
-npm run build:lib
+npm ci
+npm test          # unit tests (ChromeHeadless)
+npm run pack      # builds dist/ngx-chile-rut-x.y.z.tgz
+npm run compat    # consumer matrix across every supported Angular major (needs `n`)
 ```
 
-### Running Tests
-
-```bash
-npm test
-```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-### Publishing
-
-```bash
-npm run publish:lib
-```
-
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
-
-## Changelog
-
-See [CHANGELOG.md](./CHANGELOG.md) for a detailed list of changes.
-
-## Credits
-
-This library was originally forked and updated from the excellent work by [Platanus](https://github.com/platanus/ng2-rut).
+Each line lives on its own branch (`main` = 2.x, `1.x` = 1.x) with its own toolchain
+(`.nvmrc`). Fixes to shared code (`src/lib`, specs, `compat/consumer.spec.ts`) are
+cherry-picked between branches.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+MIT
