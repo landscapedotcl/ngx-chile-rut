@@ -59,7 +59,7 @@ describe('rut-helpers', () => {
         });
       });
 
-    ['1.111.111-1', '7.618.285-0', '12345678-K', 'K', '1', '', 'abc', '1K2-3', '0-0']
+    ['1.111.111-1', '7.618.285-0', '12345678-K', 'K', '1', '', 'abc', '1K2-3', '1K-9', '0-0']
       .forEach((rut) => {
         it(`rejects ${JSON.stringify(rut)}`, () => {
           expect(rutValidate(rut)).toBe(false);

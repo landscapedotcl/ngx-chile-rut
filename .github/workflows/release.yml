@@ -1,0 +1,38 @@
+name: Release
+
+# Publishes the line of the branch the release was cut from:
+#   main → npm dist-tag `latest`, N.x branches → dist-tag `vN-lts`.
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - id: tag
+        run: |
+          branch="${{ github.event.release.target_commitish }}"
+          if [ "$branch" = "main" ]; then echo "tag=latest" >> "$GITHUB_OUTPUT";
+          else echo "tag=v${branch%%.x}-lts" >> "$GITHUB_OUTPUT"; fi
+      # Publish with a modern npm (provenance needs npm 9+), whatever Node built the package.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm publish --provenance --access public --tag ${{ steps.tag.outputs.tag }}
+        working-directory: dist/ngx-chile-rut
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

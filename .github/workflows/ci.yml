@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main, '[0-9]+.x']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit:
+    name: Unit tests + build
+    runs-on: ubuntu-latest
+    outputs:
+      majors: ${{ steps.majors.outputs.majors }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run pack
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarball
+          path: dist/ngx-chile-rut-*.tgz
+      - id: majors
+        run: echo "majors=$(jq -cR 'split(" ") | map(select(length > 0) | tonumber)' compat/majors.txt)" >> "$GITHUB_OUTPUT"
+
+  compat:
+    name: Angular ${{ matrix.angular }}
+    needs: unit
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        angular: ${{ fromJson(needs.unit.outputs.majors) }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: node
+        run: echo "version=$(bash compat/node-for.sh ${{ matrix.angular }})" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.node.outputs.version }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: tarball
+          path: dist
+      - run: bash compat/run-consumer.sh ${{ matrix.angular }} dist/ngx-chile-rut-*.tgz
