@@ -131,6 +131,9 @@ Each line lives on its own branch (`main` = 2.x, `1.x` = 1.x) with its own toolc
 (`.nvmrc`). Fixes to shared code (`src/lib`, specs, `compat/consumer.spec.ts`) are
 cherry-picked between branches.
 
+Releases: `gh release create vX.Y.Z --target main` publishes to `latest`;
+`--target 1.x` publishes to `v1-lts` (needs the `NPM_TOKEN` secret).
+
 ## License
 
 MIT
