@@ -29,12 +29,15 @@ jobs:
           if [ "$branch" = "main" ]; then echo "tag=latest" >> "$GITHUB_OUTPUT";
           elif [[ "$branch" =~ ^[0-9]+\.x$ ]]; then echo "tag=v${branch%%.x}-lts" >> "$GITHUB_OUTPUT";
           else echo "::error::Release target '$branch' must be main or an N.x branch"; exit 1; fi
-      # Publish with a modern npm (provenance needs npm 9+), whatever Node built the package.
+      # Stage with a modern npm (staged publishing needs npm 11.15+), whatever Node built the package.
+      # NPM_TOKEN is stage-only: a maintainer approves the version with 2FA on npmjs.com
+      # (Staged Packages tab) or with `npm stage approve <stage-id>`.
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
-      - run: npm publish --provenance --access public --tag ${{ steps.tag.outputs.tag }}
+      - run: npm install -g npm@11.21.0
+      - run: npm stage publish --provenance --access public --tag ${{ steps.tag.outputs.tag }}
         working-directory: dist/ngx-chile-rut
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
