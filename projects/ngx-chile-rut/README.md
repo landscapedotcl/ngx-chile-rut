@@ -137,7 +137,8 @@ Each line lives on its own branch (`main` = 2.x, `1.x` = 1.x) with its own toolc
 cherry-picked between branches.
 
 Releases: `gh release create vX.Y.Z --target main` publishes to `latest`;
-`--target 1.x` publishes to `v1-lts` (needs the `NPM_TOKEN` secret).
+`--target 1.x` publishes to `v1-lts` (needs the stage-only `NPM_TOKEN` secret;
+CI stages the version and a maintainer approves it with 2FA under *Staged Packages* on npmjs.com).
 
 ## License
 
